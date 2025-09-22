@@ -2,16 +2,20 @@ import cosas.*
 
 object camion {
 	const property cosas = #{}
+
+	method cosas(){
+		return cosas
+	}
 		
 	method cargar(unaCosa) {
 		cosas.add(unaCosa)
 	}
 
 	method descargar(unaCosa) {
-		cosas.delete(unaCosa)
+		cosas.remove(unaCosa)
 	}
 
-	method sonTodosPar (){
+	method todosTienenPesoPar (){
 		return cosas.all({cosa => cosa.peso() % 2 == 0})
 	}
 
@@ -28,6 +32,7 @@ object camion {
 	}
 
 	method elDeNivel (nivelPeligrosidad){
+		self.validarHayAlMenosUnoDeNivel(nivelPeligrosidad)
 		return cosas.find({cosa => cosa.nivelPeligrosidad() == nivelPeligrosidad})
 	}
 
@@ -35,7 +40,7 @@ object camion {
 		return cosas.filter({cosa => cosa.nivelPeligrosidad() > nivelPeligrosidad})
 	}
 
-	method lasQueSonMasPeligrosasQue (cosa){
+	method cosasMasPeligrosasQue (cosa){
 		return self.lasQueSuperanNivelDePeligrosidad (cosa.nivelPeligrosidad())
 	}
 
@@ -48,6 +53,7 @@ object camion {
 	}
 	
 	method cosaMasPesada(){
+		self.validarHayAlMenosUnaCosa ()
 		return cosas.max({cosa => cosa.peso()})
 	}
 
@@ -59,13 +65,36 @@ object camion {
 		return cosas.sum({cosa => cosa.totalBultos()})
 	}
 
-	method sufrioAccidente(){
-		cosas.forEach({cosa => cosa.sufrioAccidente()})
+	method sufrirAccidente(){
+		cosas.forEach({cosa => cosa.sufrirAccidente()})
+	}
+
+	method transportar (destino, camino){
+		if (camino.superaRequerimientos(self)){
+			destino.cargarCosas(cosas)
+			cosas.clear()
+		}
+	}
+
+	method validarHayAlMenosUnaCosa(){
+		if (cosas.isEmpty()){
+            self.error("El camion actualmente no tiene carga.")
+        }
+	}
+
+	method validarHayAlMenosUnoDeNivel(nivelPeligrosidad){
+		if (!cosas.any({cosa => cosa.nivelPeligrosidad() == nivelPeligrosidad})){
+            self.error("El camion actualmente no se encuentra cargando una cosa con el nivel de peligrosidad dado.")
+        }
 	}
 }
 
 object almacen{
 	const cosas = #{}
+
+	method cosas(){
+		return cosas
+	}
 
 	method cargarCosas(_cosas){
 		cosas.addAll(_cosas)
@@ -74,18 +103,18 @@ object almacen{
 
 object ruta9{
 	method superaRequerimientos (vehiculo){
-		return vehiculo.puedeCircularEnRuta(20)
+		return vehiculo.puedeCircularEnRutaDeNivel(20)
 	}
 }
 
-object caminosVecinales(){
+object caminosVecinales{
 	var pesoMaximo = 500
 
-	method superaRequerimientos (vehiculo){
+	method superaRequerimientos(vehiculo){
 		return vehiculo.peso() < pesoMaximo
 	}
 
-	method pesoMaximo (_pesoMaximo){
+	method pesoMaximo(_pesoMaximo){
 		pesoMaximo = _pesoMaximo
 	}
 }

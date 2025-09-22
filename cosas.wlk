@@ -11,7 +11,7 @@ object knightRider {
 		return 1
 	}
 
-	method sufrioAccidente(){}
+	method sufrirAccidente(){}
 }
 
 object arenaAGranel{
@@ -25,36 +25,32 @@ object arenaAGranel{
 		return 1
 	}
 
-	method sufrioAccidente(){
+	method sufrirAccidente(){
 		peso += 20
 	}
 }
 
 object bumblebee{
-	var estaTransformadoEnAuto = true
+	var property estaEnModoAuto = true
 
 	method peso(){
 		return 800
 	}
 
 	method nivelPeligrosidad(){
-		if (estaTransformadoEnAuto) {
+		if (estaEnModoAuto) {
 			return 15
 		} else {
 			return 30
 		}
 	}
 
-	method estaTransformadoEnAuto (bool){
-		estaTransformadoEnAuto = bool
-	}
-
 	method totalBultos (){
 		return 2
 	}
 
-	method sufrioAccidente(){
-		estaTransformadoEnAuto = not estaTransformadoEnAuto
+	method sufrirAccidente(){
+		estaEnModoAuto = not estaEnModoAuto
 	}
 }
 
@@ -70,8 +66,11 @@ object paqueteDeLadrillos{
 	}
 
 	method cantidadDeLadrillos (_cantidadDeLadrillos){
-		self.validarCantidadDeLadrillos(_cantidadDeLadrillos)
-		cantidadDeLadrillos = _cantidadDeLadrillos
+		cantidadDeLadrillos = 0.max(_cantidadDeLadrillos)
+	}
+
+	method cantidadDeLadrillos (){
+		return cantidadDeLadrillos
 	}
 
 	method totalBultos (){
@@ -84,18 +83,16 @@ object paqueteDeLadrillos{
 		}
 	}
 
-	method validarCantidadDeLadrillos (_cantidadDeLadrillos){}
-
-	method sufrioAccidente(){
+	method sufrirAccidente(){
 		cantidadDeLadrillos = 0.max(cantidadDeLadrillos - 12)
 	}
 }
 
 object bateriaAntiaerea{
-	var tieneMisiles = true
+	var property estaCargada = false
 
 	method peso(){
-		if (tieneMisiles){
+		if (estaCargada){
 			return 300
 		} else {
 			return 200
@@ -103,27 +100,23 @@ object bateriaAntiaerea{
 	}
 
 	method nivelPeligrosidad(){
-		if (tieneMisiles) {
+		if (estaCargada) {
 			return 100
 		} else {
 			return 0
 		}
 	}
 
-	method tieneMisiles (bool){
-		tieneMisiles = bool
-	}
-
 	method totalBultos (){
-		if (!tieneMisiles){
+		if (!estaCargada){
 			return 1
 		} else {
 			return 2
 		}
 	}
 
-	method sufrioAccidente(){
-		tieneMisiles = false
+	method sufrirAccidente(){
+		estaCargada = false
 	}
 }
 
@@ -138,7 +131,7 @@ object residuosRadioactivos{
 		return 1
 	}
 
-	method sufrioAccidente(){
+	method sufrirAccidente(){
 		peso += 15
 	}
 }
@@ -151,7 +144,11 @@ object contenedorPortuario{
 	}
 
 	method nivelPeligrosidad(){
-		return 0.max(cosas.max({cosa => cosa.nivelPeligrosidad()}))
+		if (cosas.isEmpty()){
+			return 0
+		} else {
+			return cosas.max({cosa => cosa.nivelPeligrosidad()}).nivelPeligrosidad()
+		}
 	}
 
 	method cargar (cosa){
@@ -162,8 +159,8 @@ object contenedorPortuario{
 		return 1 + cosas.sum({cosa => cosa.totalBultos()})
 	}
 
-	method sufrioAccidente(){
-		cosas.forEach({cosa => cosa.sufrioAccidente()})
+	method sufrirAccidente(){
+		cosas.forEach({cosa => cosa.sufrirAccidente()})
 	}
 }
 
@@ -186,5 +183,5 @@ object embalajeDeSeguridad{
 		return 2
 	}
 
-	method sufrioAccidente(){}
+	method sufrirAccidente(){}
 }
